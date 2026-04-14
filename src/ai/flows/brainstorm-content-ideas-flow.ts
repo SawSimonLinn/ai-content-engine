@@ -1,8 +1,8 @@
 'use server';
 /**
- * @fileOverview This file implements a Genkit flow for brainstorming social media content ideas.
+ * @fileOverview This file implements a Genkit flow for brainstorming social media content ideas based on multiple topics.
  *
- * - brainstormContentIdeas - A function that generates a diverse set of 20 structured content ideas based on a topic.
+ * - brainstormContentIdeas - A function that generates a diverse set of 20 structured content ideas based on a list of topics.
  * - BrainstormContentIdeasInput - The input type for the brainstormContentIdeas function.
  * - BrainstormContentIdeasOutput - The return type for the brainstormContentIdeas function.
  */
@@ -11,7 +11,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const BrainstormContentIdeasInputSchema = z.object({
-  topic: z.string().describe('The main topic for which to generate content ideas.'),
+  topics: z.array(z.string()).describe('A list of topics for which to generate content ideas.'),
 });
 export type BrainstormContentIdeasInput = z.infer<typeof BrainstormContentIdeasInputSchema>;
 
@@ -41,7 +41,12 @@ const brainstormContentIdeasPrompt = ai.definePrompt({
   output: { schema: BrainstormContentIdeasOutputSchema },
   prompt: `You are a creative social media content strategist specializing in generating engaging content ideas.
 
-Your task is to brainstorm 20 diverse social media content ideas for the topic: "{{{topic}}}".
+Your task is to brainstorm 20 diverse social media content ideas that relate to the following topics: 
+{{#each topics}}
+- {{{this}}}
+{{/each}}
+
+The content plan should create a cohesive narrative or variety that touches upon all provided topics.
 
 For each idea, provide:
 - A catchy title.

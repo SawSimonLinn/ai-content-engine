@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Sparkles, Loader2, Plus, X } from "lucide-react";
 import { brainstormContentIdeas } from "@/ai/flows/brainstorm-content-ideas-flow";
 import { ContentPlan, ContentDay, Platform } from "@/lib/types";
 import { ContentStore } from "@/lib/content-store";
@@ -17,11 +18,23 @@ interface PlanCreatorProps {
 }
 
 export function PlanCreator({ onPlanCreated }: PlanCreatorProps) {
-  const [topic, setTopic] = useState("");
+  const [currentTopic, setCurrentTopic] = useState("");
+  const [topics, setTopics] = useState<string[]>([]);
   const [frequency, setFrequency] = useState("3");
   const [platforms, setPlatforms] = useState<Platform[]>(["Instagram", "YouTube"]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [step, setStep] = useState(1);
+
+  const handleAddTopic = () => {
+    if (currentTopic.trim() && !topics.includes(currentTopic.trim())) {
+      setTopics([...topics, currentTopic.trim()]);
+      setCurrentTopic("");
+    }
+  };
+
+  const handleRemoveTopic = (topicToRemove: string) => {
+    setTopics(topics.filter(t => t !== topicToRemove));
+  };
 
   const handlePlatformToggle = (platform: Platform) => {
     setPlatforms(prev => 
@@ -30,12 +43,12 @@ export function PlanCreator({ onPlanCreated }: PlanCreatorProps) {
   };
 
   const createPlan = async () => {
-    if (!topic) return;
+    if (topics.length === 0) return;
     setIsGenerating(true);
     setStep(2);
 
     try {
-      const brainstormingResult = await brainstormContentIdeas({ topic });
+      const brainstormingResult = await brainstormContentIdeas({ topics });
       
       setStep(3);
       const freqNum = parseInt(frequency);
@@ -70,7 +83,7 @@ export function PlanCreator({ onPlanCreated }: PlanCreatorProps) {
       const newPlan: ContentPlan = {
         id: Math.random().toString(36).substr(2, 9),
         userId: "user-1",
-        topic,
+        topics,
         frequency: freqNum,
         platforms,
         createdAt: new Date().toISOString(),
@@ -98,20 +111,42 @@ export function PlanCreator({ onPlanCreated }: PlanCreatorProps) {
         </div>
         <CardTitle className="text-4xl font-headline font-black text-black">IGNITE YOUR ENGINE</CardTitle>
         <CardDescription className="text-black font-bold uppercase tracking-tight mt-2">
-          30 days of strategy generated in seconds.
+          30 days of strategy across multiple topics.
         </CardDescription>
       </CardHeader>
       
       <CardContent className="p-8 space-y-10">
         <div className="space-y-4">
-          <Label htmlFor="topic" className="text-lg font-black uppercase">What's the topic?</Label>
-          <Input 
-            id="topic" 
-            placeholder="e.g. WEB DEVELOPMENT, DOG TOYS, AI TOOLS..." 
-            className="h-16 text-xl border-4 border-black rounded-none focus-visible:ring-brand-teal bg-white"
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-          />
+          <Label htmlFor="topic" className="text-lg font-black uppercase">What are the topics?</Label>
+          <div className="flex gap-2">
+            <Input 
+              id="topic" 
+              placeholder="e.g. WEB DEVELOPMENT, DOG TOYS..." 
+              className="h-14 text-lg border-4 border-black rounded-none focus-visible:ring-brand-teal bg-white"
+              value={currentTopic}
+              onChange={(e) => setCurrentTopic(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleAddTopic()}
+            />
+            <Button 
+              type="button" 
+              onClick={handleAddTopic}
+              className="h-14 w-14 border-4 border-black bg-white text-black hover:bg-black hover:text-white rounded-none shadow-brutalist"
+            >
+              <Plus className="h-6 w-6" />
+            </Button>
+          </div>
+          
+          <div className="flex flex-wrap gap-2 min-h-[40px]">
+            {topics.map((topic) => (
+              <Badge key={topic} className="bg-brand-teal text-white border-2 border-black rounded-none px-3 py-1 font-black uppercase flex items-center gap-2">
+                {topic}
+                <X className="h-3 w-3 cursor-pointer hover:text-brand-orange" onClick={() => handleRemoveTopic(topic)} />
+              </Badge>
+            ))}
+            {topics.length === 0 && (
+              <p className="text-xs font-bold uppercase text-muted-foreground italic">Add at least one topic to start.</p>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -153,7 +188,7 @@ export function PlanCreator({ onPlanCreated }: PlanCreatorProps) {
         <Button 
           className="w-full h-20 text-2xl font-headline font-black bg-brand-teal hover:bg-brand-teal/90 text-white border-4 border-black shadow-brutalist hover-brutalist rounded-none transition-all"
           onClick={createPlan}
-          disabled={isGenerating || !topic}
+          disabled={isGenerating || topics.length === 0}
         >
           {isGenerating ? (
             <>

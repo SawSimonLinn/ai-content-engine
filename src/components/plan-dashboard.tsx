@@ -37,14 +37,21 @@ export function PlanDashboard({ plan, onRefresh, onNewPlan }: PlanDashboardProps
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-500">
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 border-b-4 border-black pb-8">
-        <div>
+        <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <Badge className="bg-brand-orange text-black border-2 border-black font-black uppercase text-xs rounded-none py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
               ACTIVE STRATEGY
             </Badge>
           </div>
-          <h2 className="text-5xl font-headline font-black text-black leading-none uppercase">
-            {plan.topic}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {plan.topics.map((topic, i) => (
+              <Badge key={i} className="bg-brand-teal text-white border-2 border-black rounded-none font-black uppercase text-xs">
+                {topic}
+              </Badge>
+            ))}
+          </div>
+          <h2 className="text-4xl lg:text-5xl font-headline font-black text-black leading-tight uppercase">
+            {plan.topics.join(' & ')}
           </h2>
           <p className="text-lg font-bold uppercase mt-4 text-muted-foreground">
             {new Date(plan.createdAt).toLocaleDateString()} • {plan.frequency} POSTS / WEEK

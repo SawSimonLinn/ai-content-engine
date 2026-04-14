@@ -33,7 +33,7 @@ export interface ContentDay {
 export interface ContentPlan {
   id: string;
   userId: string;
-  topic: string;
+  topics: string[];
   frequency: number; // times per week
   platforms: Platform[];
   createdAt: string;

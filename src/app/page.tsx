@@ -12,7 +12,8 @@ import {
   ChevronDown, 
   Archive, 
   LayoutDashboard,
-  Zap
+  Zap,
+  Plus
 } from "lucide-react";
 import { 
   DropdownMenu, 
@@ -76,11 +77,12 @@ export default function Home() {
                 <ChevronDown className="h-4 w-4 ml-1" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64 border-2 border-black rounded-none shadow-brutalist">
+            <DropdownMenuContent align="end" className="w-80 border-2 border-black rounded-none shadow-brutalist">
               <DropdownMenuLabel className="font-headline text-xs">Current Plans</DropdownMenuLabel>
               {currentPlans.length > 0 ? currentPlans.map(p => (
-                <DropdownMenuItem key={p.id} className="cursor-pointer font-medium hover:bg-brand-teal hover:text-white" onClick={() => { setActivePlanId(p.id); setShowCreator(false); }}>
-                  {p.topic}
+                <DropdownMenuItem key={p.id} className="cursor-pointer font-medium hover:bg-brand-teal hover:text-white flex flex-col items-start gap-1" onClick={() => { setActivePlanId(p.id); setShowCreator(false); }}>
+                  <span className="font-black truncate w-full">{p.topics.join(' • ')}</span>
+                  <span className="text-[10px] opacity-70 uppercase">{new Date(p.createdAt).toLocaleDateString()}</span>
                 </DropdownMenuItem>
               )) : <div className="p-2 text-xs text-muted-foreground italic">No current plans</div>}
               
@@ -89,15 +91,16 @@ export default function Home() {
                 <Archive className="h-3 w-3" /> Archived
               </DropdownMenuLabel>
               {archivedPlans.length > 0 ? archivedPlans.map(p => (
-                <DropdownMenuItem key={p.id} className="cursor-pointer font-medium hover:bg-brand-orange hover:text-black" onClick={() => { setActivePlanId(p.id); setShowCreator(false); }}>
-                  {p.topic}
+                <DropdownMenuItem key={p.id} className="cursor-pointer font-medium hover:bg-brand-orange hover:text-black flex flex-col items-start gap-1" onClick={() => { setActivePlanId(p.id); setShowCreator(false); }}>
+                  <span className="font-black truncate w-full">{p.topics.join(' • ')}</span>
+                  <span className="text-[10px] opacity-70 uppercase">{new Date(p.createdAt).toLocaleDateString()}</span>
                 </DropdownMenuItem>
               )) : <div className="p-2 text-xs text-muted-foreground italic">No archives</div>}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="outline" size="icon" className="border-2 border-black shadow-brutalist hover-brutalist rounded-none bg-white">
-            <Settings className="h-4 w-4" />
+          <Button variant="outline" size="icon" className="border-2 border-black shadow-brutalist hover-brutalist rounded-none bg-white" onClick={() => setShowCreator(true)}>
+            <Plus className="h-4 w-4" />
           </Button>
         </div>
       </header>
