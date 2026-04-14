@@ -52,8 +52,9 @@ const generatePlatformSpecificContentPrompt = ai.definePrompt({
 Content Idea: {{{contentIdea}}}
 Target Platform: {{{platform}}}
 
-When the platform is 'Instagram', 'TikTok', or 'Facebook', provide a script, a caption, and a list of hashtags.
-When the platform is 'YouTube', provide a video title (max 99 characters, including relevant keywords/hashtags) and a detailed video description.
+When the platform is 'Instagram', provide a script, a compelling SEO-optimized caption, and a list of EXACTLY 5 relevant hashtags (Instagram best practice: 5 focused hashtags only).
+When the platform is 'TikTok' or 'Facebook', provide a script, a caption, and a list of relevant hashtags.
+When the platform is 'YouTube', provide a video title (max 99 characters, including relevant keywords/hashtags) and a detailed SEO-optimized video description (include keywords, timestamps if relevant, and a call to action).
 
 Ensure the generated content is engaging and optimized for the specified platform.
 `,
@@ -73,6 +74,6 @@ const generatePlatformSpecificContentFlow = ai.defineFlow(
     // Add the platform to the output for discriminated union validation if it's not already there by the model
     // The model should infer it from the prompt's input, but explicitly adding for type safety if needed.
     // However, the discriminatedUnion output schema usually handles this if the model is instructed correctly.
-    return { ...output, platform: input.platform };
+    return { ...output, platform: input.platform } as GeneratePlatformSpecificContentOutput;
   }
 );

@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ContentDay, ContentPlan, GeneratedAsset, Platform } from "@/lib/types";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogDescription
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,22 +15,34 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  Sparkles, 
-  Loader2, 
-  Copy, 
-  Check, 
-  Save, 
-  PlayCircle, 
-  FileText, 
+import { Input } from "@/components/ui/input";
+import {
+  Sparkles,
+  Loader2,
+  Copy,
+  Check,
+  Save,
+  PlayCircle,
+  FileText,
   Hash,
   MessageSquare,
   Circle,
-  History
+  History,
+  Send,
+  Bot,
+  User
 } from "lucide-react";
 import { generatePlatformSpecificContent } from "@/ai/flows/generate-platform-specific-content";
+import { refineScript } from "@/ai/flows/refine-script-flow";
 import { ContentStore } from "@/lib/content-store";
 import { toast } from "@/hooks/use-toast";
+
+type ContentMode = 'script' | 'caption';
+
+interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
 
 interface ContentDetailDialogProps {
   day: ContentDay;
@@ -45,6 +57,53 @@ export function ContentDetailDialog({ day, plan, isOpen, onClose, onUpdate }: Co
   const [activePlatform, setActivePlatform] = useState<Platform>(plan.platforms[0]);
   const [notes, setNotes] = useState(day.notes);
   const [copied, setCopied] = useState<string | null>(null);
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
+  const [emojiMode, setEmojiMode] = useState<'with' | 'without'>('with');
+  const [contentMode, setContentMode] = useState<ContentMode>('script');
+  const [scriptOverride, setScriptOverride] = useState<string | null>(null);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState('');
+  const [isChatting, setIsChatting] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages]);
+
+  const getSharedScript = () => {
+    if (scriptOverride !== null) return scriptOverride;
+    return day.assets?.find(a => a.script)?.script ?? '';
+  };
+
+  const handleSendChat = async () => {
+    if (!chatInput.trim()) return;
+    const currentScript = getSharedScript();
+    const userMsg = chatInput.trim();
+    setChatInput('');
+    const newMessages: ChatMessage[] = [...chatMessages, { role: 'user', content: userMsg }];
+    setChatMessages(newMessages);
+    setIsChatting(true);
+    try {
+      const refined = await refineScript({
+        currentScript,
+        platform: day.idea.type === 'video' ? 'TikTok/Instagram/YouTube' : plan.platforms[0],
+        userInstruction: userMsg,
+      });
+      setScriptOverride(refined);
+      setChatMessages([...newMessages, { role: 'assistant', content: 'Script updated!' }]);
+    } catch {
+      toast({ variant: 'destructive', title: 'Failed to update script' });
+    } finally {
+      setIsChatting(false);
+    }
+  };
+
+  const formatText = (text: string) => {
+    if (emojiMode === 'without') {
+      return text.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').replace(/\s{2,}/g, ' ').trim();
+    }
+    return text;
+  };
 
   const handleGenerate = async () => {
     setIsGenerating(true);
@@ -114,9 +173,9 @@ export function ContentDetailDialog({ day, plan, isOpen, onClose, onUpdate }: Co
           </div>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto lg:overflow-hidden grid grid-cols-1 lg:grid-cols-12 bg-background">
+        <div className="flex-1 min-h-0 overflow-y-auto lg:overflow-hidden grid grid-cols-1 lg:grid-cols-12 bg-background">
           {/* Main Content Area */}
-          <div className="lg:col-span-8 p-4 md:p-8 flex flex-col gap-6 md:gap-8 lg:overflow-hidden border-b-4 lg:border-b-0 lg:border-r-4 border-black">
+          <div className="lg:col-span-8 p-4 md:p-8 flex flex-col gap-6 md:gap-8 lg:overflow-hidden min-h-0 border-b-4 lg:border-b-0 lg:border-r-4 border-black">
             {!day.assets ? (
               <div className="flex-1 flex flex-col items-center justify-center text-center p-6 md:p-12 space-y-4 md:space-y-6 border-4 border-dashed border-black bg-white shadow-brutalist">
                 <div className="p-4 md:p-6 bg-brand-orange border-2 border-black shadow-brutalist">
@@ -138,77 +197,222 @@ export function ContentDetailDialog({ day, plan, isOpen, onClose, onUpdate }: Co
               </div>
             ) : (
               <>
-                <Tabs value={activePlatform} onValueChange={(v) => setActivePlatform(v as Platform)} className="w-full flex flex-col flex-1">
-                  <TabsList className="w-full h-14 bg-black p-1 rounded-none grid" style={{ gridTemplateColumns: `repeat(${plan.platforms.length}, 1fr)` }}>
-                    {plan.platforms.map(p => (
-                      <TabsTrigger key={p} value={p} className="rounded-none font-black uppercase text-xs data-[state=active]:bg-brand-teal data-[state=active]:text-white">
-                        {p}
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
+                {/* Script / Caption Toggle */}
+                <div className="flex items-center gap-1 border-4 border-black self-start">
+                  <button
+                    onClick={() => setContentMode('script')}
+                    className={`px-4 py-2 text-xs font-black uppercase transition-colors flex items-center gap-2 ${contentMode === 'script' ? 'bg-black text-white' : 'bg-white text-black hover:bg-muted'}`}
+                  >
+                    <FileText className="h-3.5 w-3.5" /> Script
+                  </button>
+                  <button
+                    onClick={() => setContentMode('caption')}
+                    className={`px-4 py-2 text-xs font-black uppercase transition-colors flex items-center gap-2 ${contentMode === 'caption' ? 'bg-black text-white' : 'bg-white text-black hover:bg-muted'}`}
+                  >
+                    <MessageSquare className="h-3.5 w-3.5" /> Caption
+                  </button>
+                </div>
 
-                  <ScrollArea className="flex-1 mt-8 pr-4">
-                    {currentAsset ? (
+                {/* Platform Tabs — only shown in Caption mode */}
+                {contentMode === 'caption' && (
+                  <Tabs value={activePlatform} onValueChange={(v) => { setActivePlatform(v as Platform); setSelectedTags(new Set()); }} className="w-full">
+                    <TabsList className="w-full h-14 bg-black p-1 rounded-none grid" style={{ gridTemplateColumns: `repeat(${plan.platforms.length}, 1fr)` }}>
+                      {plan.platforms.map(p => (
+                        <TabsTrigger key={p} value={p} className="rounded-none font-black uppercase text-xs data-[state=active]:bg-brand-teal data-[state=active]:text-white">
+                          {p}
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+                  </Tabs>
+                )}
+
+                <ScrollArea className="flex-1 pr-4">
+                  {contentMode === 'script' ? (
+                    /* ── SCRIPT VIEW (shared for all platforms) ── */
+                    <div className="space-y-6 pb-6">
+                      {getSharedScript() ? (
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <Label className="flex items-center gap-2 font-black uppercase text-sm">
+                              <FileText className="h-5 w-5 text-brand-teal" /> Video Script
+                            </Label>
+                            <Button variant="outline" size="sm" className="border-2 border-black rounded-none shadow-brutalist hover-brutalist bg-white"
+                              onClick={() => copyToClipboard(formatText(getSharedScript()), 'script')}>
+                              {copied === 'script' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                            </Button>
+                          </div>
+                          <div className="p-6 bg-white border-2 border-black shadow-brutalist text-sm leading-relaxed whitespace-pre-wrap font-medium min-h-[140px]">
+                            {formatText(getSharedScript())}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center py-10 font-black uppercase text-muted-foreground text-sm border-4 border-dashed border-black">
+                          No script — generate assets first.
+                        </div>
+                      )}
+
+                      {/* AI Chat to refine script */}
+                      <div className="border-4 border-black bg-white">
+                        <div className="bg-black text-white px-4 py-2 flex items-center gap-2">
+                          <Bot className="h-4 w-4 text-brand-teal" />
+                          <span className="text-xs font-black uppercase">Refine Script with AI</span>
+                        </div>
+
+                        {chatMessages.length > 0 && (
+                          <div className="p-4 space-y-3 max-h-48 overflow-y-auto border-b-2 border-black">
+                            {chatMessages.map((msg, i) => (
+                              <div key={i} className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                {msg.role === 'assistant' && <Bot className="h-4 w-4 mt-0.5 text-brand-teal flex-shrink-0" />}
+                                <div className={`px-3 py-2 text-xs font-bold max-w-[80%] border-2 border-black ${msg.role === 'user' ? 'bg-brand-teal text-white' : 'bg-secondary text-black'}`}>
+                                  {msg.content}
+                                </div>
+                                {msg.role === 'user' && <User className="h-4 w-4 mt-0.5 text-brand-orange flex-shrink-0" />}
+                              </div>
+                            ))}
+                            <div ref={chatEndRef} />
+                          </div>
+                        )}
+
+                        <div className="p-3 flex gap-2">
+                          <Input
+                            value={chatInput}
+                            onChange={(e) => setChatInput(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendChat(); } }}
+                            placeholder="e.g. Make it shorter, add a hook..."
+                            className="border-2 border-black rounded-none font-bold text-xs h-10 focus-visible:ring-brand-teal"
+                            disabled={isChatting || !getSharedScript()}
+                          />
+                          <Button
+                            size="sm"
+                            className="bg-brand-teal text-white border-2 border-black rounded-none shadow-brutalist hover-brutalist h-10 px-3"
+                            onClick={handleSendChat}
+                            disabled={isChatting || !chatInput.trim() || !getSharedScript()}
+                          >
+                            {isChatting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : currentAsset ? (
+                    /* ── CAPTION VIEW ── */
                       <div className="space-y-8 pb-10">
-                        {currentAsset.title && (
-                          <div className="space-y-3">
-                            <Label className="flex items-center gap-2 font-black uppercase text-sm"><PlayCircle className="h-5 w-5 text-brand-orange" /> Video Title</Label>
-                            <div className="p-4 bg-white border-2 border-black shadow-brutalist font-headline text-xl font-black uppercase">
-                              {currentAsset.title}
-                            </div>
-                          </div>
-                        )}
-
-                        {currentAsset.script && (
-                          <div className="space-y-3">
-                            <div className="flex justify-between items-center">
-                              <Label className="flex items-center gap-2 font-black uppercase text-sm"><FileText className="h-5 w-5 text-brand-teal" /> Script / Copy</Label>
-                              <Button variant="outline" size="sm" className="border-2 border-black rounded-none shadow-brutalist hover-brutalist bg-white" onClick={() => copyToClipboard(currentAsset.script!, 'script')}>
-                                {copied === 'script' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                              </Button>
-                            </div>
-                            <div className="p-6 bg-white border-2 border-black shadow-brutalist text-sm leading-relaxed whitespace-pre-wrap font-medium">
-                              {currentAsset.script}
-                            </div>
-                          </div>
-                        )}
-
                         {currentAsset.caption && (
                           <div className="space-y-3">
-                            <Label className="flex items-center gap-2 font-black uppercase text-sm"><MessageSquare className="h-5 w-5 text-brand-teal" /> Caption</Label>
+                            <div className="flex justify-between items-center">
+                              <Label className="flex items-center gap-2 font-black uppercase text-sm">
+                                <MessageSquare className="h-5 w-5 text-brand-teal" />
+                                {activePlatform === 'Instagram' ? 'SEO Caption' : 'Caption'}
+                              </Label>
+                              <Button variant="outline" size="sm" className="border-2 border-black rounded-none shadow-brutalist hover-brutalist bg-white" onClick={() => copyToClipboard(formatText(currentAsset.caption!), 'caption')}>
+                                {copied === 'caption' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                              </Button>
+                            </div>
                             <div className="p-4 bg-secondary/10 border-2 border-black italic font-medium">
-                              {currentAsset.caption}
+                              {formatText(currentAsset.caption)}
                             </div>
                           </div>
                         )}
 
                         {currentAsset.hashtags && (
                           <div className="space-y-3">
-                            <Label className="flex items-center gap-2 font-black uppercase text-sm"><Hash className="h-5 w-5 text-brand-orange" /> Tags</Label>
+                            <div className="flex justify-between items-center">
+                              <Label className="flex items-center gap-2 font-black uppercase text-sm">
+                                <Hash className="h-5 w-5 text-brand-orange" /> Tags
+                                {activePlatform === 'Instagram' && (
+                                  <span className="text-[10px] font-black text-muted-foreground normal-case">
+                                    — tap to select ({selectedTags.size}/5)
+                                  </span>
+                                )}
+                              </Label>
+                              {activePlatform === 'Instagram' ? (
+                                selectedTags.size > 0 && (
+                                  <Button variant="outline" size="sm" className="border-2 border-black rounded-none shadow-brutalist hover-brutalist bg-white" onClick={() => copyToClipboard([...selectedTags].map(t => `#${t.replace(/^#+/, '')}`).join(' '), 'tags')}>
+                                    {copied === 'tags' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                                  </Button>
+                                )
+                              ) : (
+                                <Button variant="outline" size="sm" className="border-2 border-black rounded-none shadow-brutalist hover-brutalist bg-white" onClick={() => copyToClipboard(currentAsset.hashtags!.map(t => `#${t.replace(/^#+/, '')}`).join(' '), 'tags')}>
+                                  {copied === 'tags' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                                </Button>
+                              )}
+                            </div>
                             <div className="flex flex-wrap gap-2 p-4 bg-white border-2 border-black">
-                              {currentAsset.hashtags.map(tag => (
-                                <Badge key={tag} className="bg-brand-orange text-black border-2 border-black font-black uppercase text-[10px] rounded-none px-3">
-                                  #{tag}
-                                </Badge>
-                              ))}
+                              {currentAsset.hashtags.map(tag => {
+                                const isSelected = selectedTags.has(tag);
+                                if (activePlatform === 'Instagram') {
+                                  return (
+                                    <Badge
+                                      key={tag}
+                                      onClick={() => {
+                                        setSelectedTags(prev => {
+                                          const next = new Set(prev);
+                                          if (next.has(tag)) { next.delete(tag); } else if (next.size < 5) { next.add(tag); }
+                                          return next;
+                                        });
+                                      }}
+                                      className={`border-2 border-black font-black uppercase text-[10px] rounded-none px-3 transition-colors ${
+                                        isSelected ? 'cursor-pointer bg-black text-white'
+                                          : selectedTags.size >= 5 ? 'cursor-not-allowed bg-muted text-muted-foreground opacity-50'
+                                          : 'cursor-pointer bg-brand-orange text-black hover:bg-black hover:text-white'
+                                      }`}
+                                    >
+                                      #{tag.replace(/^#+/, '')}
+                                    </Badge>
+                                  );
+                                }
+                                return (
+                                  <Badge key={tag} className="bg-brand-orange text-black border-2 border-black font-black uppercase text-[10px] rounded-none px-3">
+                                    #{tag.replace(/^#+/, '')}
+                                  </Badge>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {currentAsset.description && activePlatform === 'YouTube' && (
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center">
+                              <Label className="flex items-center gap-2 font-black uppercase text-sm"><FileText className="h-5 w-5 text-brand-teal" /> Description</Label>
+                              <Button variant="outline" size="sm" className="border-2 border-black rounded-none shadow-brutalist hover-brutalist bg-white" onClick={() => copyToClipboard(formatText(currentAsset.description!), 'description')}>
+                                {copied === 'description' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                              </Button>
+                            </div>
+                            <div className="p-6 bg-white border-2 border-black shadow-brutalist text-sm leading-relaxed whitespace-pre-wrap font-medium">
+                              {formatText(currentAsset.description)}
                             </div>
                           </div>
                         )}
                       </div>
                     ) : (
-                      <div className="text-center py-16 font-black uppercase">
+                      <div className="text-center py-16 font-black uppercase text-muted-foreground text-sm border-4 border-dashed border-black">
                         No assets for this platform.
                       </div>
                     )}
-                  </ScrollArea>
-                </Tabs>
-                <div className="pt-6 border-t-4 border-black flex justify-between items-center">
-                   <p className="text-xs font-black uppercase">Crafted by AI Content Agent</p>
-                   <Button variant="outline" size="sm" className="border-2 border-black font-black uppercase shadow-brutalist hover-brutalist bg-white" onClick={handleGenerate} disabled={isGenerating}>
-                     <Sparkles className="mr-2 h-4 w-4" />
-                     Regenerate
-                   </Button>
-                </div>
+                </ScrollArea>
+
+                {contentMode === 'caption' && (
+                  <div className="pt-6 border-t-4 border-black flex flex-wrap justify-between items-center gap-3">
+                    <div className="flex items-center gap-1 border-2 border-black">
+                      <button
+                        onClick={() => setEmojiMode('with')}
+                        className={`px-3 py-1.5 text-xs font-black uppercase transition-colors ${emojiMode === 'with' ? 'bg-black text-white' : 'bg-white text-black hover:bg-muted'}`}
+                      >
+                        😀 With Emoji
+                      </button>
+                      <button
+                        onClick={() => setEmojiMode('without')}
+                        className={`px-3 py-1.5 text-xs font-black uppercase transition-colors ${emojiMode === 'without' ? 'bg-black text-white' : 'bg-white text-black hover:bg-muted'}`}
+                      >
+                        No Emoji
+                      </button>
+                    </div>
+                    <Button variant="outline" size="sm" className="border-2 border-black font-black uppercase shadow-brutalist hover-brutalist bg-white" onClick={handleGenerate} disabled={isGenerating}>
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Regenerate
+                    </Button>
+                  </div>
+                )}
               </>
             )}
           </div>
