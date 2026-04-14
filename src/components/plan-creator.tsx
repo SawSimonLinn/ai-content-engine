@@ -103,19 +103,19 @@ export function PlanCreator({ onPlanCreated }: PlanCreatorProps) {
 
   return (
     <Card className="max-w-2xl mx-auto border-4 border-black rounded-none shadow-brutalist-lg overflow-hidden">
-      <CardHeader className="text-center bg-brand-orange border-b-4 border-black py-10">
+      <CardHeader className="text-center bg-brand-orange border-b-4 border-black py-6 md:py-10">
         <div className="flex justify-center mb-4">
-          <div className="p-4 bg-white border-2 border-black -rotate-6 shadow-brutalist">
-            <Sparkles className="h-10 w-10 text-brand-teal" />
+          <div className="p-3 md:p-4 bg-white border-2 border-black -rotate-6 shadow-brutalist">
+            <Sparkles className="h-8 w-8 md:h-10 md:w-10 text-brand-teal" />
           </div>
         </div>
-        <CardTitle className="text-4xl font-headline font-black text-black">IGNITE YOUR ENGINE</CardTitle>
+        <CardTitle className="text-2xl md:text-4xl font-headline font-black text-black">IGNITE YOUR ENGINE</CardTitle>
         <CardDescription className="text-black font-bold uppercase tracking-tight mt-2">
           30 days of strategy across multiple topics.
         </CardDescription>
       </CardHeader>
-      
-      <CardContent className="p-8 space-y-10">
+
+      <CardContent className="p-4 sm:p-8 space-y-8 md:space-y-10">
         <div className="space-y-4">
           <Label htmlFor="topic" className="text-lg font-black uppercase">What are the topics?</Label>
           <div className="flex gap-2">
@@ -184,9 +184,9 @@ export function PlanCreator({ onPlanCreated }: PlanCreatorProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="p-8 border-t-4 border-black bg-muted/30 flex flex-col gap-6">
-        <Button 
-          className="w-full h-20 text-2xl font-headline font-black bg-brand-teal hover:bg-brand-teal/90 text-white border-4 border-black shadow-brutalist hover-brutalist rounded-none transition-all"
+      <CardFooter className="p-4 sm:p-8 border-t-4 border-black bg-muted/30 flex flex-col gap-6">
+        <Button
+          className="w-full h-14 md:h-20 text-lg md:text-2xl font-headline font-black bg-brand-teal hover:bg-brand-teal/90 text-white border-4 border-black shadow-brutalist hover-brutalist rounded-none transition-all"
           onClick={createPlan}
           disabled={isGenerating || topics.length === 0}
         >

@@ -6,11 +6,10 @@ import { ContentStore } from "@/lib/content-store";
 import { PlanCreator } from "@/components/plan-creator";
 import { PlanDashboard } from "@/components/plan-dashboard";
 import { Toaster } from "@/components/ui/toaster";
-import { 
-  Sparkles, 
-  Settings, 
-  ChevronDown, 
-  Archive, 
+import {
+  Sparkles,
+  ChevronDown,
+  Archive,
   LayoutDashboard,
   Zap,
   Plus
@@ -58,23 +57,23 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background flex flex-col font-body">
       {/* Navigation Header */}
-      <header className="sticky top-0 z-50 bg-white border-b-4 border-black px-6 h-20 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="bg-brand-teal p-2 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            <Zap className="h-6 w-6 text-white" />
+      <header className="sticky top-0 z-50 bg-white border-b-4 border-black px-3 sm:px-6 h-14 md:h-20 flex items-center justify-between">
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="bg-brand-teal p-1.5 md:p-2 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            <Zap className="h-5 w-5 md:h-6 md:w-6 text-white" />
           </div>
-          <h1 className="text-3xl font-headline font-extrabold text-black tracking-tighter">
-            AI CONTENT <span className="text-brand-teal">ENGINE</span>
+          <h1 className="text-lg sm:text-2xl md:text-3xl font-headline font-extrabold text-black tracking-tighter">
+            AI <span className="hidden sm:inline">CONTENT </span><span className="text-brand-teal">ENGINE</span>
           </h1>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="border-2 border-black font-bold uppercase tracking-tight shadow-brutalist hover-brutalist bg-white text-black">
-                <LayoutDashboard className="h-4 w-4 mr-2" />
-                History
-                <ChevronDown className="h-4 w-4 ml-1" />
+                <LayoutDashboard className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">History</span>
+                <ChevronDown className="h-4 w-4 sm:ml-1" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80 border-2 border-black rounded-none shadow-brutalist">
@@ -106,7 +105,7 @@ export default function Home() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 container mx-auto px-6 py-12 max-w-7xl">
+      <main className="flex-1 container mx-auto px-3 sm:px-6 py-6 md:py-12 max-w-7xl">
         {showCreator ? (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <PlanCreator onPlanCreated={handlePlanCreated} />
@@ -129,19 +128,19 @@ export default function Home() {
             <div className="p-8 bg-brand-orange border-4 border-black shadow-brutalist-lg mb-8 rotate-3">
               <Sparkles className="h-20 w-20 text-black animate-pulse" />
             </div>
-            <h2 className="text-5xl font-headline font-black mb-6 tracking-tighter">PLANNING SHOULDN'T <br/>BE BORING.</h2>
-            <p className="text-xl font-medium max-w-lg mb-12 bg-white border-2 border-black p-4 shadow-brutalist">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black mb-6 tracking-tighter">PLANNING SHOULDN'T <br/>BE BORING.</h2>
+            <p className="text-base md:text-xl font-medium max-w-lg mb-8 md:mb-12 bg-white border-2 border-black p-4 shadow-brutalist">
               Stop guessing. Use high-personality AI agents to build a 30-day strategy that actually resonates.
             </p>
-            <Button size="lg" className="bg-brand-teal text-white border-2 border-black shadow-brutalist h-20 px-12 text-2xl font-headline hover-brutalist transition-transform rounded-none" onClick={() => setShowCreator(true)}>
+            <Button size="lg" className="bg-brand-teal text-white border-2 border-black shadow-brutalist h-14 md:h-20 px-6 md:px-12 text-xl md:text-2xl font-headline hover-brutalist transition-transform rounded-none" onClick={() => setShowCreator(true)}>
               CREATE YOUR STRATEGY
             </Button>
           </div>
         )}
       </main>
 
-      <footer className="py-12 border-t-4 border-black bg-white">
-        <div className="container mx-auto px-6 text-center font-bold uppercase tracking-widest text-sm">
+      <footer className="py-6 md:py-12 border-t-4 border-black bg-white">
+        <div className="container mx-auto px-4 md:px-6 text-center font-bold uppercase tracking-widest text-xs md:text-sm">
           <p>© {new Date().getFullYear()} AI CONTENT ENGINE • BUILT DIFFERENT.</p>
         </div>
       </footer>

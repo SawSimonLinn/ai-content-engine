@@ -50,7 +50,7 @@ export function PlanDashboard({ plan, onRefresh, onNewPlan }: PlanDashboardProps
               </Badge>
             ))}
           </div>
-          <h2 className="text-4xl lg:text-5xl font-headline font-black text-black leading-tight uppercase">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-headline font-black text-black leading-tight uppercase">
             {plan.topics.join(' & ')}
           </h2>
           <p className="text-lg font-bold uppercase mt-4 text-muted-foreground">
@@ -58,39 +58,39 @@ export function PlanDashboard({ plan, onRefresh, onNewPlan }: PlanDashboardProps
           </p>
         </div>
         
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="outline" 
+        <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+          <Button
+            variant="outline"
             className="border-2 border-black font-bold uppercase rounded-none shadow-brutalist hover-brutalist bg-white"
             onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
           >
-            {viewMode === 'grid' ? <List className="h-4 w-4 mr-2" /> : <Calendar className="h-4 w-4 mr-2" />}
-            {viewMode === 'grid' ? 'List View' : 'Grid View'}
+            {viewMode === 'grid' ? <List className="h-4 w-4 sm:mr-2" /> : <Calendar className="h-4 w-4 sm:mr-2" />}
+            <span className="hidden sm:inline">{viewMode === 'grid' ? 'List View' : 'Grid View'}</span>
           </Button>
-          <Button 
+          <Button
             className="bg-brand-orange hover:bg-brand-orange/90 text-black border-2 border-black font-black uppercase rounded-none shadow-brutalist hover-brutalist"
             onClick={onNewPlan}
           >
-            <Plus className="h-4 w-4 mr-2" />
-            NEW PLAN
+            <Plus className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">NEW PLAN</span>
           </Button>
         </div>
       </div>
 
       {/* Progress Card */}
-      <div className="bg-brand-teal p-8 border-4 border-black shadow-brutalist-lg">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+      <div className="bg-brand-teal p-4 md:p-8 border-4 border-black shadow-brutalist-lg">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 md:mb-8 gap-4">
           <div>
             <p className="text-sm font-black text-white uppercase tracking-widest mb-1">STRATEGY PROGRESS</p>
-            <h3 className="text-4xl font-headline font-black text-white leading-none">
+            <h3 className="text-2xl md:text-4xl font-headline font-black text-white leading-none">
               {stats.completed} / {stats.total} COMPLETED
             </h3>
           </div>
-          <div className="bg-white border-4 border-black p-4 rotate-3 shadow-brutalist">
-             <p className="text-5xl font-headline font-black text-brand-teal leading-none">{Math.round(stats.progress)}%</p>
+          <div className="bg-white border-4 border-black p-3 md:p-4 rotate-3 shadow-brutalist">
+             <p className="text-3xl md:text-5xl font-headline font-black text-brand-teal leading-none">{Math.round(stats.progress)}%</p>
           </div>
         </div>
-        <Progress value={stats.progress} className="h-8 bg-black/20 border-2 border-black rounded-none overflow-hidden" />
+        <Progress value={stats.progress} className="h-6 md:h-8 bg-black/20 border-2 border-black rounded-none overflow-hidden" />
       </div>
 
       {/* Content List/Grid */}
@@ -104,11 +104,11 @@ export function PlanDashboard({ plan, onRefresh, onNewPlan }: PlanDashboardProps
             className={cn(
               "group cursor-pointer border-4 border-black rounded-none shadow-brutalist hover-brutalist transition-all duration-200",
               day.status === 'Completed' ? 'bg-secondary/20' : 'bg-white',
-              viewMode === 'list' ? 'flex flex-row items-center p-2' : ''
+              viewMode === 'list' ? 'flex sm:flex-row items-center p-2' : ''
             )}
             onClick={() => setSelectedDay(day)}
           >
-            <CardContent className={cn("p-6 w-full", viewMode === 'list' ? 'flex items-center justify-between gap-4 py-4' : 'flex flex-col h-full')}>
+            <CardContent className={cn("p-4 md:p-6 w-full", viewMode === 'list' ? 'flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 py-3 sm:py-4' : 'flex flex-col h-full')}>
               <div className={cn("flex flex-col", viewMode === 'list' ? 'flex-1' : '')}>
                 <div className="flex justify-between items-start mb-4">
                   <span className="text-sm font-black uppercase bg-black text-white px-2 py-0.5">DAY {day.dayNumber}</span>

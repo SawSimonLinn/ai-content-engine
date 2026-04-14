@@ -93,19 +93,19 @@ export function ContentDetailDialog({ day, plan, isOpen, onClose, onUpdate }: Co
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[95vh] flex flex-col p-0 overflow-hidden border-4 border-black rounded-none shadow-brutalist-lg">
-        <DialogHeader className="p-8 border-b-4 border-black bg-brand-teal text-white">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
+      <DialogContent className="w-[calc(100vw-1rem)] sm:w-full max-w-5xl max-h-[95vh] flex flex-col p-0 overflow-hidden border-4 border-black rounded-none shadow-brutalist-lg">
+        <DialogHeader className="p-4 md:p-8 border-b-4 border-black bg-brand-teal text-white flex-shrink-0">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
+            <div className="min-w-0">
               <span className="text-xs font-black uppercase tracking-widest bg-black text-white px-2 py-0.5 inline-block mb-2">Day {day.dayNumber} • {new Date(day.date).toLocaleDateString()}</span>
-              <DialogTitle className="text-4xl font-headline font-black uppercase leading-none">{day.idea.title}</DialogTitle>
-              <DialogDescription className="text-white font-bold uppercase mt-2 opacity-90">
+              <DialogTitle className="text-xl sm:text-2xl md:text-4xl font-headline font-black uppercase leading-tight">{day.idea.title}</DialogTitle>
+              <DialogDescription className="text-white font-bold uppercase mt-2 opacity-90 text-xs md:text-sm">
                 {day.idea.angle}
               </DialogDescription>
             </div>
-            <Button 
+            <Button
               variant="outline"
-              className={day.status === 'Completed' ? 'bg-secondary text-black border-2 border-black' : 'bg-white text-black border-2 border-black'}
+              className={`flex-shrink-0 text-xs md:text-sm ${day.status === 'Completed' ? 'bg-secondary text-black border-2 border-black' : 'bg-white text-black border-2 border-black'}`}
               onClick={handleToggleComplete}
             >
               {day.status === 'Completed' ? <Check className="mr-2 h-4 w-4" /> : <Circle className="mr-2 h-4 w-4" />}
@@ -114,21 +114,21 @@ export function ContentDetailDialog({ day, plan, isOpen, onClose, onUpdate }: Co
           </div>
         </DialogHeader>
 
-        <div className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12 bg-background">
+        <div className="flex-1 overflow-y-auto lg:overflow-hidden grid grid-cols-1 lg:grid-cols-12 bg-background">
           {/* Main Content Area */}
-          <div className="lg:col-span-8 p-8 flex flex-col gap-8 overflow-hidden border-r-4 border-black">
+          <div className="lg:col-span-8 p-4 md:p-8 flex flex-col gap-6 md:gap-8 lg:overflow-hidden border-b-4 lg:border-b-0 lg:border-r-4 border-black">
             {!day.assets ? (
-              <div className="flex-1 flex flex-col items-center justify-center text-center p-12 space-y-6 border-4 border-dashed border-black bg-white shadow-brutalist">
-                <div className="p-6 bg-brand-orange border-2 border-black shadow-brutalist">
-                  <Sparkles className="h-14 w-14 text-black" />
+              <div className="flex-1 flex flex-col items-center justify-center text-center p-6 md:p-12 space-y-4 md:space-y-6 border-4 border-dashed border-black bg-white shadow-brutalist">
+                <div className="p-4 md:p-6 bg-brand-orange border-2 border-black shadow-brutalist">
+                  <Sparkles className="h-10 w-10 md:h-14 md:w-14 text-black" />
                 </div>
-                <h3 className="text-3xl font-headline font-black uppercase">Build Your Assets</h3>
-                <p className="text-lg font-bold max-w-sm mx-auto">
+                <h3 className="text-xl md:text-3xl font-headline font-black uppercase">Build Your Assets</h3>
+                <p className="text-sm md:text-lg font-bold max-w-sm mx-auto">
                   Our Content Agents are ready to draft your scripts, captions, and tags.
                 </p>
-                <Button 
-                  size="lg" 
-                  className="bg-brand-teal text-white border-2 border-black h-16 px-10 text-xl font-headline font-black shadow-brutalist hover-brutalist rounded-none" 
+                <Button
+                  size="lg"
+                  className="bg-brand-teal text-white border-2 border-black h-12 md:h-16 px-6 md:px-10 text-base md:text-xl font-headline font-black shadow-brutalist hover-brutalist rounded-none"
                   onClick={handleGenerate}
                   disabled={isGenerating}
                 >
@@ -214,7 +214,7 @@ export function ContentDetailDialog({ day, plan, isOpen, onClose, onUpdate }: Co
           </div>
 
           {/* Sidebar Area */}
-          <div className="lg:col-span-4 bg-white p-8 flex flex-col gap-10">
+          <div className="lg:col-span-4 bg-white p-4 md:p-8 flex flex-col gap-6 md:gap-10">
              <div className="space-y-6">
                <Label className="text-lg font-black uppercase flex items-center gap-2">
                  <History className="h-5 w-5 text-brand-orange" /> Tracking
