@@ -33,7 +33,6 @@ export default function Home() {
     const loadedPlans = ContentStore.getPlans();
     setPlans(loadedPlans);
     
-    // Auto-select latest non-archived plan
     const latest = loadedPlans.filter(p => !p.isArchived).sort((a, b) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     )[0];
@@ -56,48 +55,48 @@ export default function Home() {
   const currentPlans = plans.filter(p => !p.isArchived);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-body">
+    <div className="min-h-screen bg-background flex flex-col font-body">
       {/* Navigation Header */}
-      <header className="sticky top-0 z-50 bg-white border-b shadow-sm px-6 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="bg-brand-teal p-1.5 rounded-lg">
+      <header className="sticky top-0 z-50 bg-white border-b-4 border-black px-6 h-20 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="bg-brand-teal p-2 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
             <Zap className="h-6 w-6 text-white" />
           </div>
-          <h1 className="text-2xl font-headline font-bold text-slate-900 tracking-tight">
-            AI Content <span className="text-brand-teal">Engine</span>
+          <h1 className="text-3xl font-headline font-extrabold text-black tracking-tighter">
+            AI CONTENT <span className="text-brand-teal">ENGINE</span>
           </h1>
         </div>
 
         <div className="flex items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="font-medium flex items-center gap-2">
-                <LayoutDashboard className="h-4 w-4 text-brand-teal" />
-                Plan History
-                <ChevronDown className="h-4 w-4" />
+              <Button variant="outline" className="border-2 border-black font-bold uppercase tracking-tight shadow-brutalist hover-brutalist bg-white text-black">
+                <LayoutDashboard className="h-4 w-4 mr-2" />
+                History
+                <ChevronDown className="h-4 w-4 ml-1" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64">
-              <DropdownMenuLabel>Current Plans</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="w-64 border-2 border-black rounded-none shadow-brutalist">
+              <DropdownMenuLabel className="font-headline text-xs">Current Plans</DropdownMenuLabel>
               {currentPlans.length > 0 ? currentPlans.map(p => (
-                <DropdownMenuItem key={p.id} onClick={() => { setActivePlanId(p.id); setShowCreator(false); }}>
+                <DropdownMenuItem key={p.id} className="cursor-pointer font-medium hover:bg-brand-teal hover:text-white" onClick={() => { setActivePlanId(p.id); setShowCreator(false); }}>
                   {p.topic}
                 </DropdownMenuItem>
               )) : <div className="p-2 text-xs text-muted-foreground italic">No current plans</div>}
               
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel className="flex items-center gap-2">
+              <DropdownMenuSeparator className="bg-black h-px" />
+              <DropdownMenuLabel className="font-headline text-xs flex items-center gap-2">
                 <Archive className="h-3 w-3" /> Archived
               </DropdownMenuLabel>
               {archivedPlans.length > 0 ? archivedPlans.map(p => (
-                <DropdownMenuItem key={p.id} onClick={() => { setActivePlanId(p.id); setShowCreator(false); }}>
+                <DropdownMenuItem key={p.id} className="cursor-pointer font-medium hover:bg-brand-orange hover:text-black" onClick={() => { setActivePlanId(p.id); setShowCreator(false); }}>
                   {p.topic}
                 </DropdownMenuItem>
               )) : <div className="p-2 text-xs text-muted-foreground italic">No archives</div>}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="outline" size="icon" className="rounded-full">
+          <Button variant="outline" size="icon" className="border-2 border-black shadow-brutalist hover-brutalist rounded-none bg-white">
             <Settings className="h-4 w-4" />
           </Button>
         </div>
@@ -106,11 +105,11 @@ export default function Home() {
       {/* Main Content Area */}
       <main className="flex-1 container mx-auto px-6 py-12 max-w-7xl">
         {showCreator ? (
-          <div className="animate-in fade-in zoom-in-95 duration-500">
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <PlanCreator onPlanCreated={handlePlanCreated} />
             {plans.length > 0 && (
               <div className="mt-8 text-center">
-                <Button variant="link" onClick={() => setShowCreator(false)} className="text-brand-teal">
+                <Button variant="link" onClick={() => setShowCreator(false)} className="text-brand-teal font-bold uppercase decoration-2 underline-offset-4">
                   Return to Active Plan
                 </Button>
               </div>
@@ -124,23 +123,23 @@ export default function Home() {
           />
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="p-6 bg-brand-teal/5 rounded-full mb-6">
-              <Sparkles className="h-16 w-16 text-brand-teal animate-pulse" />
+            <div className="p-8 bg-brand-orange border-4 border-black shadow-brutalist-lg mb-8 rotate-3">
+              <Sparkles className="h-20 w-20 text-black animate-pulse" />
             </div>
-            <h2 className="text-3xl font-headline mb-4">Ready to automate your strategy?</h2>
-            <p className="text-muted-foreground text-lg max-w-md mb-8">
-              Generate a high-performance 30-day content calendar for multiple platforms in seconds.
+            <h2 className="text-5xl font-headline font-black mb-6 tracking-tighter">PLANNING SHOULDN'T <br/>BE BORING.</h2>
+            <p className="text-xl font-medium max-w-lg mb-12 bg-white border-2 border-black p-4 shadow-brutalist">
+              Stop guessing. Use high-personality AI agents to build a 30-day strategy that actually resonates.
             </p>
-            <Button size="lg" className="bg-brand-teal text-white h-14 px-10 text-xl font-headline" onClick={() => setShowCreator(true)}>
-              Create Your First Plan
+            <Button size="lg" className="bg-brand-teal text-white border-2 border-black shadow-brutalist h-20 px-12 text-2xl font-headline hover-brutalist transition-transform rounded-none" onClick={() => setShowCreator(true)}>
+              CREATE YOUR STRATEGY
             </Button>
           </div>
         )}
       </main>
 
-      <footer className="py-8 border-t bg-white">
-        <div className="container mx-auto px-6 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} AI Content Engine. Built with agent chaining technology.</p>
+      <footer className="py-12 border-t-4 border-black bg-white">
+        <div className="container mx-auto px-6 text-center font-bold uppercase tracking-widest text-sm">
+          <p>© {new Date().getFullYear()} AI CONTENT ENGINE • BUILT DIFFERENT.</p>
         </div>
       </footer>
 

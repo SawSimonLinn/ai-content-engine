@@ -4,59 +4,73 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
+    --background: 45 30% 97%; /* Soft Cream */
+    --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
+    --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 180 92% 29%; /* Vibrant Teal */
-    --primary-foreground: 210 20% 98%;
-    --secondary: 20 100% 63%; /* Energetic Orange */
-    --secondary-foreground: 224 71.4% 4.1%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --accent: 180 92% 95%;
-    --accent-foreground: 180 92% 29%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 262 83% 58%; /* Electric Purple */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 65 92% 63%; /* Acid Green/Yellow */
+    --secondary-foreground: 240 10% 3.9%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 262 83% 95%;
+    --accent-foreground: 262 83% 58%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 180 92% 29%;
-    --radius: 0.75rem;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 10%; /* Darker borders for Brutalist look */
+    --input: 240 5.9% 10%;
+    --ring: 262 83% 58%;
+    --radius: 0px; /* Sharp corners for Brutalist vibe */
   }
 
   .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 180 92% 29%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 20 100% 63%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 65 92% 63%;
+    --secondary-foreground: 240 10% 3.9%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 180 92% 29%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 262 83% 58%;
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-black; /* Force black borders for Brutalist style */
   }
   body {
     @apply bg-background text-foreground;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-headline tracking-tight;
+    @apply font-headline uppercase tracking-tighter;
+  }
+}
+
+/* Custom Brutalist Shadow Utility */
+@layer utilities {
+  .shadow-brutalist {
+    box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+  }
+  .shadow-brutalist-lg {
+    box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+  }
+  .hover-brutalist:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px 0px rgba(0, 0, 0, 1);
   }
 }

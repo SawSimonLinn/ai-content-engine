@@ -10,8 +10,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Inter', 'sans-serif'],
-        headline: ['Space Grotesk', 'sans-serif'],
+        body: ['Work Sans', 'sans-serif'],
+        headline: ['Syne', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
@@ -49,10 +49,10 @@ export default {
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
         brand: {
-          teal: '#069494',
-          orange: '#FF8243',
-          pink: '#FFC0CB',
-          yellow: '#FCE883',
+          teal: '#7C3AED', // Electric Purple
+          orange: '#EAB308', // Neon Yellow
+          pink: '#F472B6',
+          yellow: '#FDE047',
         },
         chart: {
           '1': 'hsl(var(--chart-1))',

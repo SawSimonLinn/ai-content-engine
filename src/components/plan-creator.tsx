@@ -7,9 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Sparkles, Loader2, Check } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 import { brainstormContentIdeas } from "@/ai/flows/brainstorm-content-ideas-flow";
-import { ContentPlan, ContentDay, ContentIdea, Platform } from "@/lib/types";
+import { ContentPlan, ContentDay, Platform } from "@/lib/types";
 import { ContentStore } from "@/lib/content-store";
 
 interface PlanCreatorProps {
@@ -21,7 +21,7 @@ export function PlanCreator({ onPlanCreated }: PlanCreatorProps) {
   const [frequency, setFrequency] = useState("3");
   const [platforms, setPlatforms] = useState<Platform[]>(["Instagram", "YouTube"]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [step, setStep] = useState(1); // 1: Input, 2: Brainstorming, 3: Planning
+  const [step, setStep] = useState(1);
 
   const handlePlatformToggle = (platform: Platform) => {
     setPlatforms(prev => 
@@ -35,27 +35,21 @@ export function PlanCreator({ onPlanCreated }: PlanCreatorProps) {
     setStep(2);
 
     try {
-      // Step 2: Brainstorm Agent
       const brainstormingResult = await brainstormContentIdeas({ topic });
       
       setStep(3);
-      // Step 3: Planning Agent (logic to distribute ideas over 30 days)
       const freqNum = parseInt(frequency);
       const totalPosts = Math.ceil((freqNum / 7) * 30);
       const selectedIdeas = brainstormingResult.ideas.slice(0, totalPosts);
       
       const days: ContentDay[] = [];
       const startDate = new Date();
-      
-      // Distribute ideas over 30 days
       const postInterval = 7 / freqNum;
       let ideaIndex = 0;
 
       for (let i = 1; i <= 30; i++) {
         const currentDate = new Date(startDate);
         currentDate.setDate(startDate.getDate() + (i - 1));
-        
-        // Basic logic: place a post every few days based on frequency
         const shouldPost = Math.floor((i - 1) / postInterval) > Math.floor((i - 2) / postInterval) || i === 1;
         
         if (shouldPost && ideaIndex < selectedIdeas.length) {
@@ -70,10 +64,6 @@ export function PlanCreator({ onPlanCreated }: PlanCreatorProps) {
             postingTime: '10:00 AM'
           });
           ideaIndex++;
-        } else {
-          // Fill rest with empty or placeholder if needed, but the prompt says 30-day dashboard
-          // We'll only create active days for simplicity in the list, but for 30-day dashboard
-          // we should represent all days. Let's just create content-less days for empty ones.
         }
       }
 
@@ -99,58 +89,59 @@ export function PlanCreator({ onPlanCreated }: PlanCreatorProps) {
   };
 
   return (
-    <Card className="max-w-2xl mx-auto shadow-xl border-2 border-brand-teal/10">
-      <CardHeader className="text-center">
+    <Card className="max-w-2xl mx-auto border-4 border-black rounded-none shadow-brutalist-lg overflow-hidden">
+      <CardHeader className="text-center bg-brand-orange border-b-4 border-black py-10">
         <div className="flex justify-center mb-4">
-          <div className="p-3 bg-brand-teal/10 rounded-full">
-            <Sparkles className="h-8 w-8 text-brand-teal" />
+          <div className="p-4 bg-white border-2 border-black -rotate-6 shadow-brutalist">
+            <Sparkles className="h-10 w-10 text-brand-teal" />
           </div>
         </div>
-        <CardTitle className="text-3xl font-headline text-brand-teal">Ignite Your Content</CardTitle>
-        <CardDescription className="text-lg">
-          Transform a single topic into a full 30-day automated strategy.
+        <CardTitle className="text-4xl font-headline font-black text-black">IGNITE YOUR ENGINE</CardTitle>
+        <CardDescription className="text-black font-bold uppercase tracking-tight mt-2">
+          30 days of strategy generated in seconds.
         </CardDescription>
       </CardHeader>
       
-      <CardContent className="space-y-8">
-        <div className="space-y-3">
-          <Label htmlFor="topic" className="text-base font-semibold">What's your main topic?</Label>
+      <CardContent className="p-8 space-y-10">
+        <div className="space-y-4">
+          <Label htmlFor="topic" className="text-lg font-black uppercase">What's the topic?</Label>
           <Input 
             id="topic" 
-            placeholder="e.g. Sustainable Living, Web Development Tips..." 
-            className="h-12 text-lg border-2 focus-visible:ring-brand-teal"
+            placeholder="e.g. WEB DEVELOPMENT, DOG TOYS, AI TOOLS..." 
+            className="h-16 text-xl border-4 border-black rounded-none focus-visible:ring-brand-teal bg-white"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-3">
-            <Label className="text-base font-semibold">How often do you post?</Label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          <div className="space-y-4">
+            <Label className="text-lg font-black uppercase">Frequency</Label>
             <Select value={frequency} onValueChange={setFrequency}>
-              <SelectTrigger className="h-12 border-2">
+              <SelectTrigger className="h-14 border-4 border-black rounded-none font-bold bg-white">
                 <SelectValue placeholder="Select frequency" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">1 time per week</SelectItem>
-                <SelectItem value="3">3 times per week</SelectItem>
-                <SelectItem value="5">5 times per week</SelectItem>
-                <SelectItem value="7">Every day</SelectItem>
+              <SelectContent className="border-2 border-black rounded-none">
+                <SelectItem value="1">1 TIME / WEEK</SelectItem>
+                <SelectItem value="3">3 TIMES / WEEK</SelectItem>
+                <SelectItem value="5">5 TIMES / WEEK</SelectItem>
+                <SelectItem value="7">EVERY SINGLE DAY</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <div className="space-y-3">
-            <Label className="text-base font-semibold">Target Platforms</Label>
-            <div className="grid grid-cols-2 gap-3 pt-1">
+          <div className="space-y-4">
+            <Label className="text-lg font-black uppercase">Channels</Label>
+            <div className="grid grid-cols-2 gap-4 pt-1">
               {['Instagram', 'TikTok', 'Facebook', 'YouTube'].map((p) => (
-                <div key={p} className="flex items-center space-x-2">
+                <div key={p} className="flex items-center space-x-3 p-2 border-2 border-black hover:bg-muted transition-colors cursor-pointer" onClick={() => handlePlatformToggle(p as Platform)}>
                   <Checkbox 
                     id={`p-${p}`} 
                     checked={platforms.includes(p as Platform)}
+                    className="border-2 border-black rounded-none"
                     onCheckedChange={() => handlePlatformToggle(p as Platform)}
                   />
-                  <Label htmlFor={`p-${p}`} className="cursor-pointer">{p}</Label>
+                  <Label htmlFor={`p-${p}`} className="cursor-pointer font-bold uppercase text-xs">{p}</Label>
                 </div>
               ))}
             </div>
@@ -158,35 +149,35 @@ export function PlanCreator({ onPlanCreated }: PlanCreatorProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-col gap-4">
+      <CardFooter className="p-8 border-t-4 border-black bg-muted/30 flex flex-col gap-6">
         <Button 
-          className="w-full h-14 text-xl font-headline bg-brand-teal hover:bg-brand-teal/90 transition-all shadow-lg"
+          className="w-full h-20 text-2xl font-headline font-black bg-brand-teal hover:bg-brand-teal/90 text-white border-4 border-black shadow-brutalist hover-brutalist rounded-none transition-all"
           onClick={createPlan}
           disabled={isGenerating || !topic}
         >
           {isGenerating ? (
             <>
-              <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-              {step === 2 ? "Brainstorming Ideas..." : "Orchestrating Plan..."}
+              <Loader2 className="mr-2 h-8 w-8 animate-spin" />
+              {step === 2 ? "BRAINSTORMING..." : "CALCULATING..."}
             </>
           ) : (
             <>
-              Generate Full 30-Day Plan
-              <Sparkles className="ml-2 h-5 w-5" />
+              GENERATE STRATEGY
+              <Sparkles className="ml-3 h-6 w-6" />
             </>
           )}
         </Button>
         
         {isGenerating && (
-          <div className="w-full space-y-2">
-            <div className="flex justify-between text-xs text-muted-foreground px-1">
-              <span>Input Received</span>
-              <span>Brainstorming</span>
-              <span>Planning</span>
+          <div className="w-full space-y-3">
+            <div className="flex justify-between text-xs font-black uppercase px-1">
+              <span>STARTED</span>
+              <span className={step >= 2 ? "text-brand-teal" : ""}>IDEATING</span>
+              <span className={step >= 3 ? "text-brand-teal" : ""}>PLANNING</span>
             </div>
-            <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+            <div className="h-4 w-full bg-white border-2 border-black rounded-none overflow-hidden">
               <div 
-                className="h-full bg-brand-orange transition-all duration-500" 
+                className="h-full bg-brand-orange border-r-2 border-black transition-all duration-500" 
                 style={{ width: step === 2 ? '50%' : step === 3 ? '85%' : '0%' }}
               />
             </div>

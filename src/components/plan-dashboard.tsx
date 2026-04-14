@@ -2,25 +2,18 @@
 
 import { useState, useMemo } from "react";
 import { ContentPlan, ContentDay, Platform } from "@/lib/types";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   Calendar, 
   List, 
-  ChevronRight, 
   Clock, 
   MessageSquare, 
-  CheckCircle2, 
-  Circle, 
-  Loader2, 
-  History,
   Plus
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ContentStore } from "@/lib/content-store";
 import { ContentDetailDialog } from "./content-detail-dialog";
 
 interface PlanDashboardProps {
@@ -40,97 +33,111 @@ export function PlanDashboard({ plan, onRefresh, onNewPlan }: PlanDashboardProps
     return { total, completed, progress };
   }, [plan]);
 
-  const handleUpdateStatus = (dayId: string, status: any) => {
-    ContentStore.updateDay(plan.id, dayId, { status });
-    onRefresh();
-  };
-
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-500">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 border-b-4 border-black pb-8">
         <div>
-          <h2 className="text-3xl font-headline text-brand-teal flex items-center gap-2">
-            {plan.topic}
-            <Badge variant="outline" className="text-brand-orange border-brand-orange bg-brand-orange/5">
-              30-Day Plan
+          <div className="flex items-center gap-3 mb-2">
+            <Badge className="bg-brand-orange text-black border-2 border-black font-black uppercase text-xs rounded-none py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              ACTIVE STRATEGY
             </Badge>
+          </div>
+          <h2 className="text-5xl font-headline font-black text-black leading-none uppercase">
+            {plan.topic}
           </h2>
-          <p className="text-muted-foreground mt-1">
-            Created on {new Date(plan.createdAt).toLocaleDateString()} • {plan.frequency} posts/week
+          <p className="text-lg font-bold uppercase mt-4 text-muted-foreground">
+            {new Date(plan.createdAt).toLocaleDateString()} • {plan.frequency} POSTS / WEEK
           </p>
         </div>
         
-        <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}>
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="outline" 
+            className="border-2 border-black font-bold uppercase rounded-none shadow-brutalist hover-brutalist bg-white"
+            onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+          >
             {viewMode === 'grid' ? <List className="h-4 w-4 mr-2" /> : <Calendar className="h-4 w-4 mr-2" />}
-            {viewMode === 'grid' ? 'List View' : 'Calendar View'}
+            {viewMode === 'grid' ? 'List View' : 'Grid View'}
           </Button>
-          <Button className="bg-brand-orange hover:bg-brand-orange/90 text-white" onClick={onNewPlan}>
+          <Button 
+            className="bg-brand-orange hover:bg-brand-orange/90 text-black border-2 border-black font-black uppercase rounded-none shadow-brutalist hover-brutalist"
+            onClick={onNewPlan}
+          >
             <Plus className="h-4 w-4 mr-2" />
-            New Plan
+            NEW PLAN
           </Button>
         </div>
       </div>
 
       {/* Progress Card */}
-      <Card className="bg-brand-teal/5 border-brand-teal/20">
-        <CardContent className="pt-6">
-          <div className="flex justify-between items-end mb-4">
-            <div>
-              <p className="text-sm font-medium text-brand-teal uppercase tracking-wider">Overall Progress</p>
-              <h3 className="text-2xl font-headline">{stats.completed} / {stats.total} Content Items Done</h3>
-            </div>
-            <p className="text-3xl font-headline text-brand-teal">{Math.round(stats.progress)}%</p>
+      <div className="bg-brand-teal p-8 border-4 border-black shadow-brutalist-lg">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+          <div>
+            <p className="text-sm font-black text-white uppercase tracking-widest mb-1">STRATEGY PROGRESS</p>
+            <h3 className="text-4xl font-headline font-black text-white leading-none">
+              {stats.completed} / {stats.total} COMPLETED
+            </h3>
           </div>
-          <Progress value={stats.progress} className="h-3 bg-white/50" />
-        </CardContent>
-      </Card>
+          <div className="bg-white border-4 border-black p-4 rotate-3 shadow-brutalist">
+             <p className="text-5xl font-headline font-black text-brand-teal leading-none">{Math.round(stats.progress)}%</p>
+          </div>
+        </div>
+        <Progress value={stats.progress} className="h-8 bg-black/20 border-2 border-black rounded-none overflow-hidden" />
+      </div>
 
       {/* Content List/Grid */}
       <div className={cn(
-        "grid gap-4",
-        viewMode === 'grid' ? "grid-cols-1 md:grid-cols-3 lg:grid-cols-5" : "grid-cols-1"
+        "grid gap-6",
+        viewMode === 'grid' ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-4" : "grid-cols-1"
       )}>
         {plan.days.map((day) => (
           <Card 
             key={day.id} 
             className={cn(
-              "group cursor-pointer hover:border-brand-teal hover:shadow-md transition-all duration-300",
-              day.status === 'Completed' ? 'bg-brand-teal/5 border-brand-teal/30' : ''
+              "group cursor-pointer border-4 border-black rounded-none shadow-brutalist hover-brutalist transition-all duration-200",
+              day.status === 'Completed' ? 'bg-secondary/20' : 'bg-white',
+              viewMode === 'list' ? 'flex flex-row items-center p-2' : ''
             )}
             onClick={() => setSelectedDay(day)}
           >
-            <CardContent className="p-5">
-              <div className="flex justify-between items-start mb-3">
-                <span className="text-xs font-bold text-muted-foreground">DAY {day.dayNumber}</span>
-                <Badge variant={day.status === 'Completed' ? 'default' : 'secondary'} className={cn(
-                  "text-[10px]",
-                  day.status === 'Completed' ? 'bg-brand-teal' : 'bg-muted'
-                )}>
-                  {day.status}
-                </Badge>
-              </div>
-              
-              <h4 className="font-headline text-lg line-clamp-2 mb-2 group-hover:text-brand-teal transition-colors">
-                {day.idea.title}
-              </h4>
-              
-              <div className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
-                <Clock className="h-3 w-3" />
-                <span>{new Date(day.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} • {day.postingTime}</span>
+            <CardContent className={cn("p-6 w-full", viewMode === 'list' ? 'flex items-center justify-between gap-4 py-4' : 'flex flex-col h-full')}>
+              <div className={cn("flex flex-col", viewMode === 'list' ? 'flex-1' : '')}>
+                <div className="flex justify-between items-start mb-4">
+                  <span className="text-sm font-black uppercase bg-black text-white px-2 py-0.5">DAY {day.dayNumber}</span>
+                  <Badge className={cn(
+                    "text-[10px] font-black uppercase border-2 border-black rounded-none",
+                    day.status === 'Completed' ? 'bg-brand-teal text-white' : 'bg-white text-black'
+                  )}>
+                    {day.status}
+                  </Badge>
+                </div>
+                
+                <h4 className="font-headline text-2xl font-black uppercase line-clamp-2 mb-4 group-hover:text-brand-teal transition-colors">
+                  {day.idea.title}
+                </h4>
+                
+                <div className="flex items-center gap-3 text-xs font-bold uppercase mb-6">
+                  <div className="flex items-center gap-1.5 bg-muted px-2 py-1 border border-black">
+                    <Clock className="h-3 w-3" />
+                    <span>{new Date(day.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                  </div>
+                  <div className="bg-muted px-2 py-1 border border-black">
+                    {day.postingTime}
+                  </div>
+                </div>
               </div>
 
-              <div className="flex flex-wrap gap-1 mt-auto">
+              <div className="flex flex-wrap gap-2 mt-auto">
                 {plan.platforms.map(p => (
-                  <Badge key={p} variant="outline" className="text-[9px] py-0 px-1 border-brand-teal/20 text-brand-teal">
+                  <div key={p} className="text-[10px] font-black uppercase border-2 border-black px-2 py-0.5 bg-brand-orange/10">
                     {p}
-                  </Badge>
+                  </div>
                 ))}
               </div>
               
-              {day.notes && (
-                <div className="mt-3 pt-3 border-t border-dashed flex items-center gap-1.5 text-xs text-muted-foreground italic">
+              {day.notes && viewMode === 'grid' && (
+                <div className="mt-6 pt-4 border-t-2 border-dashed border-black flex items-center gap-2 text-xs font-bold uppercase italic text-muted-foreground">
                   <MessageSquare className="h-3 w-3" />
                   <span className="truncate">{day.notes}</span>
                 </div>
