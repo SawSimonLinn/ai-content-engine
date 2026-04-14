@@ -25,6 +25,7 @@ const ContentIdeaSchema = z.object({
 });
 
 const BrainstormContentIdeasOutputSchema = z.object({
+  planTitle: z.string().describe('A short, punchy 3-6 word headline that captures the spirit of this content strategy. Should be bold and motivating, NOT just a list of the topics.'),
   ideas: z.array(ContentIdeaSchema).length(20).describe('A list of 20 diverse content ideas.'),
 });
 export type BrainstormContentIdeasOutput = z.infer<typeof BrainstormContentIdeasOutputSchema>;
@@ -41,12 +42,14 @@ const brainstormContentIdeasPrompt = ai.definePrompt({
   output: { schema: BrainstormContentIdeasOutputSchema },
   prompt: `You are a creative social media content strategist specializing in generating engaging content ideas.
 
-Your task is to brainstorm 20 diverse social media content ideas that relate to the following topics: 
+Your task is to brainstorm 20 diverse social media content ideas that relate to the following topics:
 {{#each topics}}
 - {{{this}}}
 {{/each}}
 
 The content plan should create a cohesive narrative or variety that touches upon all provided topics.
+
+Also generate a planTitle: a short, punchy 3-6 word headline that captures the spirit of this strategy. Make it bold and motivating — something like "BUILD IN PUBLIC DAILY" or "DOMINATE THE FEED" or "FROM ZERO TO VIRAL". Do NOT just list the topics.
 
 For each idea, provide:
 - A catchy title.
@@ -54,7 +57,7 @@ For each idea, provide:
 - A brief hook concept to grab the audience's attention.
 - A unique angle or perspective for the content.
 
-Ensure the ideas are varied and provide a rich pool of starting points. The output must be a JSON array of 20 content ideas.`,
+Ensure the ideas are varied and provide a rich pool of starting points. The output must include planTitle and a JSON array of 20 content ideas.`,
 });
 
 const brainstormContentIdeasFlow = ai.defineFlow(

@@ -52,15 +52,15 @@ export function PlanCreator({ onPlanCreated }: PlanCreatorProps) {
       
       setStep(3);
       const freqNum = parseInt(frequency);
-      const totalPosts = Math.ceil((freqNum / 7) * 30);
+      const totalPosts = Math.ceil((freqNum / 7) * 7);
       const selectedIdeas = brainstormingResult.ideas.slice(0, totalPosts);
-      
+
       const days: ContentDay[] = [];
       const startDate = new Date();
       const postInterval = 7 / freqNum;
       let ideaIndex = 0;
 
-      for (let i = 1; i <= 30; i++) {
+      for (let i = 1; i <= 7; i++) {
         const currentDate = new Date(startDate);
         currentDate.setDate(startDate.getDate() + (i - 1));
         const shouldPost = Math.floor((i - 1) / postInterval) > Math.floor((i - 2) / postInterval) || i === 1;
@@ -83,6 +83,7 @@ export function PlanCreator({ onPlanCreated }: PlanCreatorProps) {
       const newPlan: ContentPlan = {
         id: Math.random().toString(36).substr(2, 9),
         userId: "user-1",
+        title: brainstormingResult.planTitle,
         topics,
         frequency: freqNum,
         platforms,
@@ -111,7 +112,7 @@ export function PlanCreator({ onPlanCreated }: PlanCreatorProps) {
         </div>
         <CardTitle className="text-2xl md:text-4xl font-headline font-black text-black">IGNITE YOUR ENGINE</CardTitle>
         <CardDescription className="text-black font-bold uppercase tracking-tight mt-2">
-          30 days of strategy across multiple topics.
+          7 days of strategy across multiple topics.
         </CardDescription>
       </CardHeader>
 

@@ -50,9 +50,11 @@ export function PlanDashboard({ plan, onRefresh, onNewPlan }: PlanDashboardProps
               </Badge>
             ))}
           </div>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-headline font-black text-black leading-tight uppercase">
-            {plan.topics.join(' & ')}
-          </h2>
+          {plan.title && (
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-headline font-black text-black leading-tight uppercase">
+              {plan.title}
+            </h2>
+          )}
           <p className="text-lg font-bold uppercase mt-4 text-muted-foreground">
             {new Date(plan.createdAt).toLocaleDateString()} • {plan.frequency} POSTS / WEEK
           </p>
