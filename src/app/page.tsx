@@ -6,6 +6,7 @@ import { ContentStore } from "@/lib/content-store";
 import { PlanCreator } from "@/components/plan-creator";
 import { PlanDashboard } from "@/components/plan-dashboard";
 import { Toaster } from "@/components/ui/toaster";
+import Link from "next/link";
 import {
   Sparkles,
   ChevronDown,
@@ -68,6 +69,12 @@ export default function Home() {
         </div>
 
         <div className="flex items-center gap-2 md:gap-4">
+          <Link
+            href="/about"
+            className="hidden sm:flex items-center border-2 border-black px-3 py-1.5 text-xs font-bold uppercase tracking-widest shadow-brutalist hover-brutalist bg-white transition-transform"
+          >
+            About
+          </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="border-2 border-black font-bold uppercase tracking-tight shadow-brutalist hover-brutalist bg-white text-black">
@@ -105,12 +112,12 @@ export default function Home() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 container mx-auto px-3 sm:px-6 py-6 md:py-12 max-w-7xl">
+      <main className="flex-1 container mx-auto px-3 sm:px-6 max-w-5xl flex flex-col">
         {showCreator ? (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="flex-1 flex flex-col justify-center py-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <PlanCreator onPlanCreated={handlePlanCreated} />
             {plans.length > 0 && (
-              <div className="mt-8 text-center">
+              <div className="mt-4 text-center">
                 <Button variant="link" onClick={() => setShowCreator(false)} className="text-brand-teal font-bold uppercase decoration-2 underline-offset-4">
                   Return to Active Plan
                 </Button>
@@ -118,11 +125,13 @@ export default function Home() {
             )}
           </div>
         ) : activePlan ? (
-          <PlanDashboard 
-            plan={activePlan} 
-            onRefresh={() => setPlans(ContentStore.getPlans())}
-            onNewPlan={() => setShowCreator(true)}
-          />
+          <div className="py-6 md:py-10">
+            <PlanDashboard
+              plan={activePlan}
+              onRefresh={() => setPlans(ContentStore.getPlans())}
+              onNewPlan={() => setShowCreator(true)}
+            />
+          </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="p-8 bg-brand-orange border-4 border-black shadow-brutalist-lg mb-8 rotate-3">
@@ -139,9 +148,18 @@ export default function Home() {
         )}
       </main>
 
-      <footer className="py-6 md:py-12 border-t-4 border-black bg-white">
-        <div className="container mx-auto px-4 md:px-6 text-center font-bold uppercase tracking-widest text-xs md:text-sm">
+      <footer className="py-2 border-t-4 border-black bg-white">
+        <div className="container mx-auto px-4 md:px-6 flex flex-wrap items-center justify-between gap-2 text-[10px] font-bold uppercase tracking-widest">
           <p>© {new Date().getFullYear()} AI CONTENT ENGINE • BUILT DIFFERENT.</p>
+          <div className="flex items-center gap-3">
+            <a href="https://www.linkedin.com/in/sawsimonlinn/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-teal transition-colors">LinkedIn</a>
+            <span className="text-black/30">•</span>
+            <a href="https://github.com/SawSimonLinn/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-teal transition-colors">GitHub</a>
+            <span className="text-black/30">•</span>
+            <a href="https://simonlinn.dev/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-teal transition-colors">simonlinn.dev</a>
+            <span className="text-black/30">•</span>
+            <a href="https://www.codeheavenstudio.com/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-teal transition-colors">CodeHeaven Studio</a>
+          </div>
         </div>
       </footer>
 

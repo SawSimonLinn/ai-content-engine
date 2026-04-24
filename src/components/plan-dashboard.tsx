@@ -110,10 +110,10 @@ export function PlanDashboard({ plan, onRefresh, onNewPlan }: PlanDashboardProps
             )}
             onClick={() => setSelectedDay(day)}
           >
-            <CardContent className={cn("p-4 md:p-6 w-full", viewMode === 'list' ? 'flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 py-3 sm:py-4' : 'flex flex-col h-full')}>
+            <CardContent className={cn("p-3 md:p-4 w-full", viewMode === 'list' ? 'flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 py-3 sm:py-4' : 'flex flex-col h-full')}>
               <div className={cn("flex flex-col", viewMode === 'list' ? 'flex-1' : '')}>
-                <div className="flex justify-between items-start mb-4">
-                  <span className="text-sm font-black uppercase bg-black text-white px-2 py-0.5">DAY {day.dayNumber}</span>
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-xs font-black uppercase bg-black text-white px-2 py-0.5">DAY {day.dayNumber}</span>
                   <Badge className={cn(
                     "text-[10px] font-black uppercase border-2 border-black rounded-none",
                     day.status === 'Completed' ? 'bg-brand-teal text-white' : 'bg-white text-black'
@@ -121,32 +121,35 @@ export function PlanDashboard({ plan, onRefresh, onNewPlan }: PlanDashboardProps
                     {day.status}
                   </Badge>
                 </div>
-                
-                <h4 className="font-headline text-2xl font-black uppercase line-clamp-2 mb-4 group-hover:text-brand-teal transition-colors">
+
+                <h4 className={cn(
+                  "font-headline font-black uppercase line-clamp-2 group-hover:text-brand-teal transition-colors mb-2",
+                  viewMode === 'grid' ? 'text-base' : 'text-xl'
+                )}>
                   {day.idea.title}
                 </h4>
-                
-                <div className="flex items-center gap-3 text-xs font-bold uppercase mb-6">
-                  <div className="flex items-center gap-1.5 bg-muted px-2 py-1 border border-black">
+
+                <div className="flex items-center gap-2 text-xs font-bold uppercase mb-3">
+                  <div className="flex items-center gap-1 bg-muted px-2 py-0.5 border border-black">
                     <Clock className="h-3 w-3" />
                     <span>{new Date(day.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
                   </div>
-                  <div className="bg-muted px-2 py-1 border border-black">
+                  <div className="bg-muted px-2 py-0.5 border border-black">
                     {day.postingTime}
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2 mt-auto">
+              <div className="flex flex-wrap gap-1.5 mt-auto">
                 {plan.platforms.map(p => (
                   <div key={p} className="text-[10px] font-black uppercase border-2 border-black px-2 py-0.5 bg-brand-orange/10">
                     {p}
                   </div>
                 ))}
               </div>
-              
+
               {day.notes && viewMode === 'grid' && (
-                <div className="mt-6 pt-4 border-t-2 border-dashed border-black flex items-center gap-2 text-xs font-bold uppercase italic text-muted-foreground">
+                <div className="mt-3 pt-2 border-t-2 border-dashed border-black flex items-center gap-2 text-xs font-bold uppercase italic text-muted-foreground">
                   <MessageSquare className="h-3 w-3" />
                   <span className="truncate">{day.notes}</span>
                 </div>
