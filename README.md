@@ -2,7 +2,7 @@
 
 AI Content Engine is a Next.js application for planning, generating, and managing social content with AI.
 It lets you define topics and channels, generate a weekly strategy, create platform-specific assets, and track execution progress.
-![alt text](image.png)
+![alt text](image-1.png)
 
 ## Features
 
