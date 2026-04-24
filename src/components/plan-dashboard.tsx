@@ -34,35 +34,34 @@ export function PlanDashboard({ plan, onRefresh, onNewPlan }: PlanDashboardProps
   }, [plan]);
 
   return (
-    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-500">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-500">
       {/* Header Section */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 border-b-4 border-black pb-8">
-        <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
-            <Badge className="bg-brand-orange text-black border-2 border-black font-black uppercase text-xs rounded-none py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+      <div className="flex flex-row justify-between items-center gap-4 border-b-4 border-black pb-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-2 mb-1">
+            <Badge className="bg-brand-orange text-black border-2 border-black font-black uppercase text-[10px] rounded-none py-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
               ACTIVE STRATEGY
             </Badge>
-          </div>
-          <div className="flex flex-wrap gap-2 mb-4">
             {plan.topics.map((topic, i) => (
-              <Badge key={i} className="bg-brand-teal text-white border-2 border-black rounded-none font-black uppercase text-xs">
+              <Badge key={i} className="bg-brand-teal text-white border-2 border-black rounded-none font-black uppercase text-[10px]">
                 {topic}
               </Badge>
             ))}
           </div>
           {plan.title && (
-            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-headline font-black text-black leading-tight uppercase">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-headline font-black text-black leading-tight uppercase truncate">
               {plan.title}
             </h2>
           )}
-          <p className="text-lg font-bold uppercase mt-4 text-muted-foreground">
+          <p className="text-xs font-bold uppercase text-muted-foreground mt-0.5">
             {new Date(plan.createdAt).toLocaleDateString()} • {plan.frequency} POSTS / WEEK
           </p>
         </div>
-        
-        <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+
+        <div className="flex items-center gap-2 flex-shrink-0">
           <Button
             variant="outline"
+            size="sm"
             className="border-2 border-black font-bold uppercase rounded-none shadow-brutalist hover-brutalist bg-white"
             onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
           >
@@ -70,6 +69,7 @@ export function PlanDashboard({ plan, onRefresh, onNewPlan }: PlanDashboardProps
             <span className="hidden sm:inline">{viewMode === 'grid' ? 'List View' : 'Grid View'}</span>
           </Button>
           <Button
+            size="sm"
             className="bg-brand-orange hover:bg-brand-orange/90 text-black border-2 border-black font-black uppercase rounded-none shadow-brutalist hover-brutalist"
             onClick={onNewPlan}
           >
@@ -80,19 +80,19 @@ export function PlanDashboard({ plan, onRefresh, onNewPlan }: PlanDashboardProps
       </div>
 
       {/* Progress Card */}
-      <div className="bg-brand-teal p-4 md:p-8 border-4 border-black shadow-brutalist-lg">
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 md:mb-8 gap-4">
+      <div className="bg-brand-teal px-5 py-3 border-4 border-black shadow-brutalist-lg">
+        <div className="flex flex-row justify-between items-center gap-4 mb-3">
           <div>
-            <p className="text-sm font-black text-white uppercase tracking-widest mb-1">STRATEGY PROGRESS</p>
-            <h3 className="text-2xl md:text-4xl font-headline font-black text-white leading-none">
+            <p className="text-[10px] font-black text-white uppercase tracking-widest">STRATEGY PROGRESS</p>
+            <h3 className="text-lg md:text-2xl font-headline font-black text-white leading-none">
               {stats.completed} / {stats.total} COMPLETED
             </h3>
           </div>
-          <div className="bg-white border-4 border-black p-3 md:p-4 rotate-3 shadow-brutalist">
-             <p className="text-3xl md:text-5xl font-headline font-black text-brand-teal leading-none">{Math.round(stats.progress)}%</p>
+          <div className="bg-white border-4 border-black px-3 py-1.5 rotate-3 shadow-brutalist">
+            <p className="text-2xl md:text-3xl font-headline font-black text-brand-teal leading-none">{Math.round(stats.progress)}%</p>
           </div>
         </div>
-        <Progress value={stats.progress} className="h-6 md:h-8 bg-black/20 border-2 border-black rounded-none overflow-hidden" />
+        <Progress value={stats.progress} className="h-4 bg-black/20 border-2 border-black rounded-none overflow-hidden" />
       </div>
 
       {/* Content List/Grid */}
