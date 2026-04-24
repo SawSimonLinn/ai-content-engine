@@ -9,9 +9,11 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { enforceRateLimit } from '@/lib/rate-limiter';
 
 const BrainstormContentIdeasInputSchema = z.object({
   topics: z.array(z.string()).describe('A list of topics for which to generate content ideas.'),
+  count: z.number().min(1).max(30).describe('The exact number of content ideas to generate.'),
 });
 export type BrainstormContentIdeasInput = z.infer<typeof BrainstormContentIdeasInputSchema>;
 
@@ -26,13 +28,14 @@ const ContentIdeaSchema = z.object({
 
 const BrainstormContentIdeasOutputSchema = z.object({
   planTitle: z.string().describe('A short, punchy 3-6 word headline that captures the spirit of this content strategy. Should be bold and motivating, NOT just a list of the topics.'),
-  ideas: z.array(ContentIdeaSchema).length(20).describe('A list of 20 diverse content ideas.'),
+  ideas: z.array(ContentIdeaSchema).min(1).describe('A list of up to 20 diverse content ideas.'),
 });
 export type BrainstormContentIdeasOutput = z.infer<typeof BrainstormContentIdeasOutputSchema>;
 
 export async function brainstormContentIdeas(
   input: BrainstormContentIdeasInput
 ): Promise<BrainstormContentIdeasOutput> {
+  await enforceRateLimit();
   return brainstormContentIdeasFlow(input);
 }
 
@@ -42,7 +45,7 @@ const brainstormContentIdeasPrompt = ai.definePrompt({
   output: { schema: BrainstormContentIdeasOutputSchema },
   prompt: `You are a creative social media content strategist specializing in generating engaging content ideas.
 
-Your task is to brainstorm 20 diverse social media content ideas that relate to the following topics:
+Your task is to brainstorm exactly {{{count}}} diverse social media content ideas that relate to the following topics:
 {{#each topics}}
 - {{{this}}}
 {{/each}}
@@ -57,7 +60,7 @@ For each idea, provide:
 - A brief hook concept to grab the audience's attention.
 - A unique angle or perspective for the content.
 
-Ensure the ideas are varied and provide a rich pool of starting points. The output must include planTitle and a JSON array of 20 content ideas.`,
+You MUST generate EXACTLY {{{count}}} ideas — no more, no less. The output must include planTitle and a JSON array of exactly {{{count}}} content ideas.`,
 });
 
 const brainstormContentIdeasFlow = ai.defineFlow(

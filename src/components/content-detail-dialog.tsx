@@ -9,12 +9,11 @@ import {
   DialogTitle,
   DialogDescription
 } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import {
   Sparkles,
@@ -22,7 +21,6 @@ import {
   Copy,
   Check,
   Save,
-  PlayCircle,
   FileText,
   Hash,
   MessageSquare,
@@ -54,6 +52,8 @@ interface ContentDetailDialogProps {
 
 export function ContentDetailDialog({ day, plan, isOpen, onClose, onUpdate }: ContentDetailDialogProps) {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [localAssets, setLocalAssets] = useState(day.assets);
+  const [localStatus, setLocalStatus] = useState(day.status);
   const [activePlatform, setActivePlatform] = useState<Platform>(plan.platforms[0]);
   const [notes, setNotes] = useState(day.notes);
   const [copied, setCopied] = useState<string | null>(null);
@@ -72,7 +72,7 @@ export function ContentDetailDialog({ day, plan, isOpen, onClose, onUpdate }: Co
 
   const getSharedScript = () => {
     if (scriptOverride !== null) return scriptOverride;
-    return day.assets?.find(a => a.script)?.script ?? '';
+    return localAssets?.find(a => a.script)?.script ?? '';
   };
 
   const handleSendChat = async () => {
@@ -116,10 +116,9 @@ export function ContentDetailDialog({ day, plan, isOpen, onClose, onUpdate }: Co
         });
         results.push(result);
       }
-      ContentStore.updateDay(plan.id, day.id, { 
-        assets: results,
-        status: 'In progress' 
-      });
+      ContentStore.updateDay(plan.id, day.id, { assets: results, status: 'In progress' });
+      setLocalAssets(results);
+      setLocalStatus('In progress');
       onUpdate();
       toast({ title: "Content Generated!", description: "AI has built the assets." });
     } catch (error) {
@@ -137,8 +136,9 @@ export function ContentDetailDialog({ day, plan, isOpen, onClose, onUpdate }: Co
   };
 
   const handleToggleComplete = () => {
-    const newStatus = day.status === 'Completed' ? 'In progress' : 'Completed';
+    const newStatus = localStatus === 'Completed' ? 'In progress' : 'Completed';
     ContentStore.updateDay(plan.id, day.id, { status: newStatus });
+    setLocalStatus(newStatus);
     onUpdate();
   };
 
@@ -148,35 +148,38 @@ export function ContentDetailDialog({ day, plan, isOpen, onClose, onUpdate }: Co
     setTimeout(() => setCopied(null), 2000);
   };
 
-  const currentAsset = day.assets?.find(a => a.platform === activePlatform);
+  const currentAsset = localAssets?.find(a => a.platform === activePlatform);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[calc(100vw-1rem)] sm:w-full max-w-5xl max-h-[95vh] flex flex-col p-0 overflow-hidden border-4 border-black rounded-none shadow-brutalist-lg">
-        <DialogHeader className="p-4 md:p-8 border-b-4 border-black bg-brand-teal text-white flex-shrink-0">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
-            <div className="min-w-0">
-              <span className="text-xs font-black uppercase tracking-widest bg-black text-white px-2 py-0.5 inline-block mb-2">Day {day.dayNumber} • {new Date(day.date).toLocaleDateString()}</span>
-              <DialogTitle className="text-xl sm:text-2xl md:text-4xl font-headline font-black uppercase leading-tight">{day.idea.title}</DialogTitle>
-              <DialogDescription className="text-white font-bold uppercase mt-2 opacity-90 text-xs md:text-sm">
+        <DialogHeader className="px-4 py-3 md:px-6 md:py-4 border-b-4 border-black bg-brand-teal text-white flex-shrink-0">
+          <div className="flex flex-row justify-between items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className="text-[10px] font-black uppercase tracking-widest bg-black text-white px-2 py-0.5 flex-shrink-0">Day {day.dayNumber} • {new Date(day.date).toLocaleDateString()}</span>
+              </div>
+              <DialogTitle className="text-base sm:text-lg md:text-xl font-headline font-black uppercase leading-tight truncate">{day.idea.title}</DialogTitle>
+              <DialogDescription className="text-white/70 font-bold uppercase text-[10px] truncate mt-0.5">
                 {day.idea.angle}
               </DialogDescription>
             </div>
             <Button
               variant="outline"
-              className={`flex-shrink-0 text-xs md:text-sm ${day.status === 'Completed' ? 'bg-secondary text-black border-2 border-black' : 'bg-white text-black border-2 border-black'}`}
+              size="sm"
+              className={`flex-shrink-0 text-xs ${localStatus === 'Completed' ? 'bg-secondary text-black border-2 border-black' : 'bg-white text-black border-2 border-black'}`}
               onClick={handleToggleComplete}
             >
-              {day.status === 'Completed' ? <Check className="mr-2 h-4 w-4" /> : <Circle className="mr-2 h-4 w-4" />}
-              {day.status === 'Completed' ? 'COMPLETED' : 'MARK AS DONE'}
+              {localStatus === 'Completed' ? <Check className="mr-1.5 h-3.5 w-3.5" /> : <Circle className="mr-1.5 h-3.5 w-3.5" />}
+              {localStatus === 'Completed' ? 'COMPLETED' : 'MARK AS DONE'}
             </Button>
           </div>
         </DialogHeader>
 
-        <div className="flex-1 min-h-0 overflow-y-auto lg:overflow-hidden grid grid-cols-1 lg:grid-cols-12 bg-background">
+        <div className="flex-1 min-h-0 overflow-y-auto grid grid-cols-1 lg:grid-cols-12 bg-background">
           {/* Main Content Area */}
-          <div className="lg:col-span-8 p-4 md:p-8 flex flex-col gap-6 md:gap-8 lg:overflow-hidden min-h-0 border-b-4 lg:border-b-0 lg:border-r-4 border-black">
-            {!day.assets ? (
+          <div className="lg:col-span-8 p-4 md:p-8 flex flex-col gap-6 md:gap-8 border-b-4 lg:border-b-0 lg:border-r-4 border-black">
+            {!localAssets ? (
               <div className="flex-1 flex flex-col items-center justify-center text-center p-6 md:p-12 space-y-4 md:space-y-6 border-4 border-dashed border-black bg-white shadow-brutalist">
                 <div className="p-4 md:p-6 bg-brand-orange border-2 border-black shadow-brutalist">
                   <Sparkles className="h-10 w-10 md:h-14 md:w-14 text-black" />
@@ -226,7 +229,7 @@ export function ContentDetailDialog({ day, plan, isOpen, onClose, onUpdate }: Co
                   </Tabs>
                 )}
 
-                <ScrollArea className="flex-1 pr-4">
+                <div className="pr-4">
                   {contentMode === 'script' ? (
                     /* ── SCRIPT VIEW (shared for all platforms) ── */
                     <div className="space-y-6 pb-6">
@@ -389,7 +392,7 @@ export function ContentDetailDialog({ day, plan, isOpen, onClose, onUpdate }: Co
                         No assets for this platform.
                       </div>
                     )}
-                </ScrollArea>
+                </div>
 
                 {contentMode === 'caption' && (
                   <div className="pt-6 border-t-4 border-black flex flex-wrap justify-between items-center gap-3">
@@ -427,7 +430,7 @@ export function ContentDetailDialog({ day, plan, isOpen, onClose, onUpdate }: Co
                  <div className="flex justify-between items-center font-bold uppercase text-xs">
                    <span className="text-muted-foreground">Status</span>
                    <Badge className="border-2 border-black bg-brand-teal text-white rounded-none">
-                     {day.status}
+                     {localStatus}
                    </Badge>
                  </div>
                  <div className="flex justify-between items-center font-bold uppercase text-xs">

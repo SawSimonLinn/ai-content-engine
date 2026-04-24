@@ -9,6 +9,7 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { enforceRateLimit } from '@/lib/rate-limiter';
 
 const PlatformEnum = z.enum(['Instagram', 'TikTok', 'Facebook', 'YouTube']);
 
@@ -40,6 +41,7 @@ export type GeneratePlatformSpecificContentOutput = z.infer<typeof GeneratePlatf
 export async function generatePlatformSpecificContent(
   input: GeneratePlatformSpecificContentInput
 ): Promise<GeneratePlatformSpecificContentOutput> {
+  await enforceRateLimit();
   return generatePlatformSpecificContentFlow(input);
 }
 

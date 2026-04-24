@@ -2,6 +2,7 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { enforceRateLimit } from '@/lib/rate-limiter';
 
 const RefineScriptInputSchema = z.object({
   currentScript: z.string().describe('The current video script.'),
@@ -14,6 +15,7 @@ const RefineScriptOutputSchema = z.object({
 });
 
 export async function refineScript(input: z.infer<typeof RefineScriptInputSchema>): Promise<string> {
+  await enforceRateLimit();
   const flow = ai.defineFlow(
     {
       name: 'refineScriptFlow_' + Date.now(),
